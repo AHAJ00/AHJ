@@ -1,0 +1,21 @@
+<html>
+<head><meta charset="UTF-8"></head>
+<body>
+<table border="1">
+  <tr><th>Norme</th><td>ISO 37001:2025</td></tr>
+  <tr><th>Date génération</th><td>2026-05-22T00:00:00Z</td></tr>
+  <tr><th>Score global (%)</th><td>0</td></tr>
+</table>
+<br/>
+<table border="1">
+  <tr><th>Clause</th><th>Question</th><th>Réponse</th><th>Score</th></tr>
+  <tr><td>4</td><td>Contexte et parties intéressées documentés ?</td><td>Non</td><td>0</td></tr>
+  <tr><td>5</td><td>Leadership et politique anti-corruption formalisés ?</td><td>Non</td><td>0</td></tr>
+  <tr><td>6</td><td>Évaluation des risques corruption réalisée ?</td><td>Non</td><td>0</td></tr>
+  <tr><td>7</td><td>Compétences, sensibilisation et communication en place ?</td><td>Non</td><td>0</td></tr>
+  <tr><td>8</td><td>Due diligence et contrôles opérationnels appliqués ?</td><td>Non</td><td>0</td></tr>
+  <tr><td>9</td><td>Surveillance, audit interne et revues de direction effectués ?</td><td>Non</td><td>0</td></tr>
+  <tr><td>10</td><td>Traitement des non-conformités et amélioration continue ?</td><td>Non</td><td>0</td></tr>
+</table>
+</body>
+</html>
