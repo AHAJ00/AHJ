@@ -3,164 +3,241 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Auto-évaluation ISO 37001:2025</title>
+  <title>Évaluation ISO 37001:2025 | Tableau de bord professionnel</title>
   <style>
-    body{font-family:Arial,sans-serif;margin:0;background:#f4f7fb;color:#1f2937}
-    .wrap{max-width:1100px;margin:20px auto;padding:0 16px}
-    .card{background:#fff;border-radius:12px;padding:16px;margin-bottom:16px;box-shadow:0 2px 10px rgba(0,0,0,.06)}
-    h1,h2{margin:0 0 12px}
-    .kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-    .tile{padding:12px;border-radius:10px;background:#eef2ff}
-    .tile strong{display:block;font-size:1.4rem}
-    .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-    table{width:100%;border-collapse:collapse}
-    th,td{padding:8px;border-bottom:1px solid #e5e7eb;text-align:left;vertical-align:top}
-    select,button{padding:8px;border-radius:8px;border:1px solid #cbd5e1}
-    button{cursor:pointer;background:#2563eb;color:white;border:none}
-    .danger{color:#b91c1c;font-weight:600}
-    .ok{color:#166534;font-weight:600}
-    @media (max-width:900px){.grid,.kpi{grid-template-columns:1fr}}
+    :root {
+      --bg: #f3f6fb;
+      --card: #ffffff;
+      --text: #0f172a;
+      --muted: #475569;
+      --primary: #1d4ed8;
+      --primary-soft: #dbeafe;
+      --ok: #166534;
+      --warn: #b45309;
+      --danger: #b91c1c;
+      --border: #e2e8f0;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Roboto, Arial, sans-serif;
+      color: var(--text);
+      background: linear-gradient(180deg, #eff4ff 0%, var(--bg) 35%, var(--bg) 100%);
+    }
+    .container { max-width: 1180px; margin: 24px auto; padding: 0 16px; }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, .06);
+      margin-bottom: 16px;
+    }
+    .header { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+    .title { margin: 0; font-size: 1.5rem; }
+    .subtitle { margin: 8px 0 0; color: var(--muted); }
+    .badge { background: var(--primary-soft); color: var(--primary); padding: 6px 10px; border-radius: 999px; font-weight: 600; }
+
+    .kpi { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .tile { border: 1px solid var(--border); border-radius: 12px; padding: 14px; background: #fcfdff; }
+    .tile .label { color: var(--muted); font-size: .88rem; }
+    .tile .value { margin-top: 6px; font-size: 1.5rem; font-weight: 700; }
+
+    .layout { display: grid; grid-template-columns: 1.3fr .7fr; gap: 16px; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 10px; border-bottom: 1px solid var(--border); text-align: left; vertical-align: top; }
+    th { font-size: .9rem; color: #1e293b; background: #f8fafc; }
+    select, button { font: inherit; }
+    select {
+      width: 100%;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 8px;
+      background: white;
+    }
+    .actions-list { margin: 0; padding-left: 18px; display: grid; gap: 8px; }
+    .status-ok { color: var(--ok); }
+    .status-warn { color: var(--warn); }
+    .status-danger { color: var(--danger); }
+    .btns { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+    button {
+      border: 0;
+      border-radius: 10px;
+      padding: 10px 14px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-secondary { background: #0f766e; color: #fff; }
+    .footer-note { color: var(--muted); font-size: .9rem; margin-top: 10px; }
+    a { color: var(--primary); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    @media (max-width: 980px) {
+      .kpi { grid-template-columns: repeat(2, 1fr); }
+      .layout { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 560px) {
+      .kpi { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="card">
-    <h1>Outil d’auto-évaluation ISO 37001:2025</h1>
-    <p>Évaluez rapidement votre maturité anti-corruption et exportez un rapport local (JSON ou Excel).</p>
-    <p><strong>Note importante :</strong> la norme ISO est protégée par copyright. Ce modèle n’inclut pas le texte officiel ; utilisez le lien ISO pour l’achat/téléchargement officiel.</p>
-    <p><a href="https://www.iso.org/standard/37001" target="_blank" rel="noopener">Voir la page officielle ISO 37001:2025 (édition la plus récente)</a></p>
+  <div class="container">
+    <section class="card header">
+      <div>
+        <h1 class="title">Outil professionnel d’auto-évaluation ISO 37001:2025</h1>
+        <p class="subtitle">Évaluez votre dispositif anti-corruption, identifiez les priorités et exportez un rapport pour suivi.</p>
+      </div>
+      <div class="badge">Version locale · Données non partagées</div>
+    </section>
+
+    <section class="card">
+      <div class="kpi">
+        <div class="tile"><div class="label">Score global</div><div id="score" class="value">0%</div></div>
+        <div class="tile"><div class="label">Conforme (Oui)</div><div id="okCount" class="value">0</div></div>
+        <div class="tile"><div class="label">Partiel</div><div id="partialCount" class="value">0</div></div>
+        <div class="tile"><div class="label">Critique (Non)</div><div id="criticalCount" class="value">0</div></div>
+      </div>
+    </section>
+
+    <section class="layout">
+      <div class="card">
+        <h2>Questionnaire de conformité</h2>
+        <table id="checklist" aria-label="Checklist ISO 37001"></table>
+      </div>
+
+      <aside class="card">
+        <h2>Plan d’actions prioritaire</h2>
+        <ul id="actions" class="actions-list"></ul>
+
+        <div class="btns">
+          <button id="downloadJson" class="btn-primary">Télécharger JSON</button>
+          <button id="downloadExcel" class="btn-secondary">Télécharger Excel (.xls)</button>
+        </div>
+
+        <p class="footer-note">
+          Note : le texte officiel de la norme n’est pas inclus (copyright ISO).
+          Référence officielle : <a href="https://www.iso.org/standard/85816.html" target="_blank" rel="noopener">ISO 37001:2025</a>.
+        </p>
+      </aside>
+    </section>
   </div>
 
-  <div class="card">
-    <h2>Dashboard</h2>
-    <div class="kpi">
-      <div class="tile"><span>Score global</span><strong id="score">0%</strong></div>
-      <div class="tile"><span>Conforme</span><strong id="okCount">0</strong></div>
-      <div class="tile"><span>Partiel</span><strong id="partialCount">0</strong></div>
-      <div class="tile"><span>Critique</span><strong id="criticalCount">0</strong></div>
-    </div>
-  </div>
+  <script>
+    const items = [
+      { id: 'ctx', clause: '4', q: 'Contexte et parties intéressées documentés ?' },
+      { id: 'lead', clause: '5', q: 'Leadership et politique anti-corruption formalisés ?' },
+      { id: 'risk', clause: '6', q: 'Évaluation des risques corruption réalisée ?' },
+      { id: 'support', clause: '7', q: 'Compétences, sensibilisation et communication en place ?' },
+      { id: 'ops', clause: '8', q: 'Due diligence et contrôles opérationnels appliqués ?' },
+      { id: 'perf', clause: '9', q: 'Surveillance, audit interne et revues de direction effectués ?' },
+      { id: 'improv', clause: '10', q: 'Traitement des non-conformités et amélioration continue ?' }
+    ];
 
-  <div class="card grid">
-    <div>
-      <h2>Checklist</h2>
-      <table id="checklist"></table>
-    </div>
-    <div>
-      <h2>Actions prioritaires</h2>
-      <ul id="actions"></ul>
-      <button id="download">Télécharger le rapport (JSON)</button>
-      <button id="downloadExcel">Télécharger le rapport (Excel)</button>
-    </div>
-  </div>
-</div>
+    const scoreByAnswer = { 'Non': 0, 'Partiel': 50, 'Oui': 100 };
+    const checklist = document.getElementById('checklist');
+    const actions = document.getElementById('actions');
 
-<script>
-const items = [
-  {id:'ctx', clause:'4', q:'Contexte et parties intéressées documentés ?'},
-  {id:'lead', clause:'5', q:'Leadership et politique anti-corruption formalisés ?'},
-  {id:'risk', clause:'6', q:'Évaluation des risques corruption réalisée ?'},
-  {id:'support', clause:'7', q:'Compétences, sensibilisation et communication en place ?'},
-  {id:'ops', clause:'8', q:'Due diligence et contrôles opérationnels appliqués ?'},
-  {id:'perf', clause:'9', q:'Surveillance, audit interne et revues de direction effectués ?'},
-  {id:'improv', clause:'10', q:'Traitement des non-conformités et amélioration continue ?'}
-];
+    function renderChecklist() {
+      checklist.innerHTML = '<tr><th>Clause</th><th>Exigence</th><th>Évaluation</th></tr>' + items.map((item) => `
+        <tr>
+          <td>${item.clause}</td>
+          <td>${item.q}</td>
+          <td>
+            <select data-id="${item.id}">
+              <option>Non</option>
+              <option>Partiel</option>
+              <option>Oui</option>
+            </select>
+          </td>
+        </tr>
+      `).join('');
 
-const scores = { "Non":0, "Partiel":50, "Oui":100 };
-const table = document.getElementById('checklist');
-const actions = document.getElementById('actions');
+      checklist.querySelectorAll('select').forEach((s) => s.addEventListener('change', updateDashboard));
+      updateDashboard();
+    }
 
-function render(){
-  table.innerHTML = '<tr><th>Clause</th><th>Question</th><th>Réponse</th></tr>' + items.map(i => `\
-    <tr><td>${i.clause}</td><td>${i.q}</td><td>
-      <select data-id="${i.id}">
-        <option>Non</option><option>Partiel</option><option>Oui</option>
-      </select>
-    </td></tr>`).join('');
+    function getValues() {
+      return items.map((item) => {
+        const answer = checklist.querySelector(`select[data-id="${item.id}"]`).value;
+        return { ...item, answer, score: scoreByAnswer[answer] };
+      });
+    }
 
-  table.querySelectorAll('select').forEach(s => s.addEventListener('change', update));
-  update();
-}
+    function updateDashboard() {
+      const values = getValues();
+      const total = values.reduce((sum, item) => sum + item.score, 0);
+      const global = Math.round((total / (values.length * 100)) * 100);
+      const ok = values.filter(v => v.answer === 'Oui').length;
+      const partial = values.filter(v => v.answer === 'Partiel').length;
+      const critical = values.filter(v => v.answer === 'Non').length;
 
-function update(){
-  const values = items.map(i => {
-    const v = table.querySelector(`select[data-id="${i.id}"]`).value;
-    return {...i, answer:v, score:scores[v]};
-  });
+      document.getElementById('score').textContent = `${global}%`;
+      document.getElementById('okCount').textContent = ok;
+      document.getElementById('partialCount').textContent = partial;
+      document.getElementById('criticalCount').textContent = critical;
 
-  const total = values.reduce((a,b)=>a+b.score,0);
-  const pct = Math.round(total / (values.length*100) * 100);
-  const ok = values.filter(v=>v.answer==='Oui').length;
-  const partial = values.filter(v=>v.answer==='Partiel').length;
-  const critical = values.filter(v=>v.answer==='Non').length;
+      const pending = values.filter(v => v.answer !== 'Oui');
+      actions.innerHTML = pending.length
+        ? pending.map((v) => `<li class="${v.answer === 'Non' ? 'status-danger' : 'status-warn'}">Clause ${v.clause} · ${v.q} — ${v.answer}</li>`).join('')
+        : '<li class="status-ok">Aucune action prioritaire : tous les critères sont conformes.</li>';
 
-  document.getElementById('score').textContent = pct + '%';
-  document.getElementById('okCount').textContent = ok;
-  document.getElementById('partialCount').textContent = partial;
-  document.getElementById('criticalCount').textContent = critical;
+      window.report = {
+        standard: 'ISO 37001:2025',
+        generated_at: new Date().toISOString(),
+        global_score_percent: global,
+        results: values
+      };
+    }
 
-  actions.innerHTML = values.filter(v=>v.answer!=='Oui').map(v => `
-    <li class="${v.answer==='Non'?'danger':'ok'}">Clause ${v.clause}: ${v.q} (${v.answer})</li>
-  `).join('') || '<li class="ok">Aucune action prioritaire.</li>';
+    function escapeHtml(text) {
+      return String(text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
 
-  window.report = {
-    standard: 'ISO 37001:2025',
-    generated_at: new Date().toISOString(),
-    global_score_percent: pct,
-    results: values
-  };
-}
+    function exportJson() {
+      const blob = new Blob([JSON.stringify(window.report, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'auto-evaluation-iso-37001-2025.json';
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
 
+    function exportExcel() {
+      const report = window.report;
+      const rows = report.results.map((r) => `
+        <tr><td>${escapeHtml(r.clause)}</td><td>${escapeHtml(r.q)}</td><td>${escapeHtml(r.answer)}</td><td>${r.score}</td></tr>
+      `).join('');
 
+      const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body>
+        <table border="1">
+          <tr><th>Norme</th><td>${escapeHtml(report.standard)}</td></tr>
+          <tr><th>Date génération</th><td>${escapeHtml(report.generated_at)}</td></tr>
+          <tr><th>Score global (%)</th><td>${report.global_score_percent}</td></tr>
+        </table><br/>
+        <table border="1">
+          <tr><th>Clause</th><th>Exigence</th><th>Évaluation</th><th>Score</th></tr>
+          ${rows}
+        </table>
+      </body></html>`;
 
-function escapeHtml(text){
-  return String(text)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-}
+      const blob = new Blob([html], { type: 'application/vnd.ms-excel;charset=utf-8;' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'auto-evaluation-iso-37001-2025.xls';
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
 
-function exportExcel(){
-  const report = window.report;
-  const rows = report.results.map(r => `
-    <tr><td>${escapeHtml(r.clause)}</td><td>${escapeHtml(r.q)}</td><td>${escapeHtml(r.answer)}</td><td>${r.score}</td></tr>
-  `).join('');
-
-  const htmlDoc = `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body>
-    <table border="1">
-      <tr><th>Norme</th><td>${escapeHtml(report.standard)}</td></tr>
-      <tr><th>Date génération</th><td>${escapeHtml(report.generated_at)}</td></tr>
-      <tr><th>Score global (%)</th><td>${report.global_score_percent}</td></tr>
-    </table>
-    <br/>
-    <table border="1">
-      <tr><th>Clause</th><th>Question</th><th>Réponse</th><th>Score</th></tr>
-      ${rows}
-    </table>
-  </body></html>`;
-
-  const blob = new Blob([htmlDoc], {type:'application/vnd.ms-excel;charset=utf-8;'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'auto-evaluation-iso-37001-2025.xls';
-  a.click();
-  URL.revokeObjectURL(a.href);
-}
-
-document.getElementById('download').addEventListener('click', ()=>{
-  const blob = new Blob([JSON.stringify(window.report, null, 2)], {type:'application/json'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'auto-evaluation-iso-37001-2025.json';
-  a.click();
-  URL.revokeObjectURL(a.href);
-});
-
-document.getElementById('downloadExcel').addEventListener('click', exportExcel);
-
-render();
-</script>
+    document.getElementById('downloadJson').addEventListener('click', exportJson);
+    document.getElementById('downloadExcel').addEventListener('click', exportExcel);
+    renderChecklist();
+  </script>
 </body>
 </html>
