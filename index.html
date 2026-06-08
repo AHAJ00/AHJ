@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Auto-évaluation ISO 37001 | ABMS Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #111827;
+      --soft: #1f2937;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --ok: #10b981;
+      --warn: #f59e0b;
+      --bad: #ef4444;
+      --accent: #22d3ee;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: Inter, system-ui, Arial, sans-serif; background: linear-gradient(160deg, #020617 0%, #0f172a 60%, #082f49 100%); color: var(--text); }
+    .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+    h1,h2,h3 { margin: 0 0 10px; }
+    .top { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:16px; }
+    .actions { display:flex; gap:8px; flex-wrap:wrap; }
+    button { background:var(--accent); color:#04111c; border:none; padding:10px 14px; font-weight:700; border-radius:10px; cursor:pointer; }
+    button.alt { background:#334155; color:var(--text); }
+    .grid { display:grid; grid-template-columns: repeat(4,1fr); gap:12px; margin-bottom:14px; }
+    .card { background: rgba(17,24,39,.88); border:1px solid #374151; border-radius:14px; padding:14px; }
+    .metric { font-size:1.9rem; font-weight:800; }
+    .muted { color:var(--muted); font-size:.92rem; }
+    .layout { display:grid; grid-template-columns: 1.4fr 1fr; gap:14px; }
+    .question-list { display:grid; gap:10px; max-height:72vh; overflow:auto; padding-right:4px; }
+    .q { background: rgba(31,41,55,.95); border:1px solid #4b5563; border-radius:12px; padding:12px; }
+    .q-head { display:flex; justify-content:space-between; gap:8px; align-items:flex-start; }
+    .q small { color:var(--muted); }
+    .scale { display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
+    select, textarea, input { width:100%; border:1px solid #475569; background:#0b1220; color:var(--text); border-radius:8px; padding:8px; }
+    .pill { display:inline-flex; padding:3px 9px; border-radius:999px; font-size:.78rem; font-weight:700; }
+    .ok { background: rgba(16,185,129,.2); color: #6ee7b7; }
+    .warn { background: rgba(245,158,11,.2); color: #fcd34d; }
+    .bad { background: rgba(239,68,68,.2); color: #fca5a5; }
+    .charts { display:grid; gap:12px; }
+    .two { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .table { width:100%; border-collapse:collapse; font-size:.9rem; }
+    .table th,.table td { border-bottom:1px solid #374151; text-align:left; padding:8px 6px; vertical-align:top; }
+    .heatmap { display:grid; grid-template-columns: repeat(6, 1fr); gap:6px; margin-top:10px; }
+    .cell { border-radius:8px; padding:8px; font-size:.78rem; text-align:center; border:1px solid #374151; }
+    @media (max-width: 1100px){ .layout{ grid-template-columns:1fr;} .grid{grid-template-columns: repeat(2,1fr);} .two{grid-template-columns:1fr;} }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="top">
+    <div>
+      <h1>Outil d'auto-évaluation ISO 37001 (ABMS)</h1>
+      <div class="muted">Échelle de maturité: 0=Inexistant · 1=Initial · 2=Partiel · 3=Déployé · 4=Maîtrisé · 5=Optimisé</div>
+    </div>
+    <div class="actions">
+      <button id="saveBtn" class="alt">Sauvegarder</button>
+      <button id="loadBtn" class="alt">Charger</button>
+      <button id="jsonBtn" class="alt">Exporter JSON</button>
+      <button id="csvBtn" class="alt">Exporter CSV</button>
+      <button id="resetBtn">Réinitialiser</button>
+    </div>
+  </div>
+
+  <div class="grid" id="kpis"></div>
+
+  <div class="layout">
+    <div class="card">
+      <h2>Questionnaire détaillé</h2>
+      <div class="question-list" id="questionList"></div>
+    </div>
+
+    <div class="charts">
+      <div class="card"><h3>Radar par chapitre ISO 37001</h3><canvas id="radar"></canvas></div>
+      <div class="two">
+        <div class="card"><h3>Scores par chapitre</h3><canvas id="bars"></canvas></div>
+        <div class="card"><h3>Répartition maturité</h3><canvas id="donut"></canvas></div>
+      </div>
+      <div class="card">
+        <h3>Plan d'actions priorisé</h3>
+        <table class="table" id="actionTable"><thead><tr><th>Priorité</th><th>Exigence</th><th>Écart</th><th>Action recommandée</th><th>Délai</th></tr></thead><tbody></tbody></table>
+      </div>
+      <div class="card">
+        <h3>Heatmap conformité</h3>
+        <div class="heatmap" id="heatmap"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const criteria = [
+  {id:'4.1', chapter:'Contexte', q:'Analyse du contexte interne/externe documentée et mise à jour.', w:2, action:'Formaliser une revue annuelle des enjeux et des parties prenantes.'},
+  {id:'4.2', chapter:'Contexte', q:'Cartographie des parties intéressées et exigences anti-corruption.', w:2, action:'Établir une matrice parties prenantes + obligations ABMS.'},
+  {id:'5.1', chapter:'Leadership', q:'Engagement de la direction formellement communiqué.', w:3, action:'Publier une déclaration signée et l’intégrer au onboarding.'},
+  {id:'5.2', chapter:'Leadership', q:'Politique anti-corruption approuvée, diffusée, comprise.', w:3, action:'Mettre à jour la politique, former 100% du personnel et tracer.'},
+  {id:'5.3', chapter:'Leadership', q:'Rôles, responsabilités et autorité ABMS clairement définis.', w:2, action:'Définir les rôles dans une RACI et lettre de mission conformité.'},
+  {id:'6.1', chapter:'Planification', q:'Évaluation des risques de corruption basée sur une méthodologie.', w:3, action:'Implémenter scoring risque probabilité/impact/contrôlabilité.'},
+  {id:'6.2', chapter:'Planification', q:'Objectifs anti-corruption mesurables avec indicateurs.', w:2, action:'Définir KPIs: formation, due diligence, incidents, délais de clôture.'},
+  {id:'7.2', chapter:'Support', q:'Compétences anti-corruption évaluées et plan de montée en compétence.', w:2, action:'Construire une matrice de compétences et plan de formation.'},
+  {id:'7.3', chapter:'Support', q:'Sensibilisation régulière sur risques et signaux d’alerte.', w:2, action:'Lancer campagnes trimestrielles + quiz de validation.'},
+  {id:'7.4', chapter:'Support', q:'Communication interne/externe structurée sur l’ABMS.', w:1, action:'Créer un protocole de communication et des modèles approuvés.'},
+  {id:'8.2', chapter:'Opérations', q:'Due diligence tiers proportionnée au niveau de risque.', w:3, action:'Déployer un workflow tiers avec niveaux d’examen et validation.'},
+  {id:'8.3', chapter:'Opérations', q:'Contrôles financiers et non-financiers anti-corruption en place.', w:3, action:'Renforcer séparation des tâches, seuils d’approbation et contrôles.'},
+  {id:'8.4', chapter:'Opérations', q:'Contrôles cadeaux, hospitalités, dons, sponsoring.', w:2, action:'Mettre en place registres et plafonds avec validation obligatoire.'},
+  {id:'8.7', chapter:'Opérations', q:'Mécanisme d’alerte et d’enquête confidentiel, traçable, protecteur.', w:3, action:'Déployer canal de whistleblowing et procédure d’enquête normalisée.'},
+  {id:'9.1', chapter:'Évaluation', q:'Surveillance, mesure, analyse et reporting ABMS périodiques.', w:2, action:'Automatiser tableau de bord mensuel et revue de tendances.'},
+  {id:'9.2', chapter:'Évaluation', q:'Programme d’audit interne ABMS basé sur les risques.', w:2, action:'Planifier audits ciblés annuels avec suivi des constats.'},
+  {id:'9.3', chapter:'Évaluation', q:'Revue de direction formalisée avec décisions et actions.', w:2, action:'Instituer comité semestriel avec PV et plan de suivi.'},
+  {id:'10.1', chapter:'Amélioration', q:'Gestion des non-conformités et actions correctives efficace.', w:2, action:'Mettre en place CAPA avec causes racines et vérification d’efficacité.'},
+  {id:'10.2', chapter:'Amélioration', q:'Amélioration continue ABMS pilotée par données et retours.', w:1, action:'Créer backlog d’amélioration continue priorisé trimestriellement.'}
+];
+
+let state = Object.fromEntries(criteria.map(c => [c.id,{score:0,comment:''}]));
+let radarChart, barChart, donutChart;
+
+function renderQuestions(){
+  const list = document.getElementById('questionList'); list.innerHTML='';
+  criteria.forEach(c=>{
+    const score = state[c.id].score;
+    const div = document.createElement('div'); div.className='q';
+    div.innerHTML = `<div class="q-head"><div><strong>${c.id} · ${c.chapter}</strong><br><small>${c.q}</small></div><span class="pill ${score>=4?'ok':score>=2?'warn':'bad'}">Niveau ${score}/5</span></div>
+    <div class="scale"><label>Score</label><select data-id="${c.id}" class="score">${[0,1,2,3,4,5].map(v=>`<option ${v===score?'selected':''} value="${v}">${v}</option>`).join('')}</select></div>
+    <label style="display:block; margin-top:8px">Commentaire / preuve</label><textarea rows="2" data-id="${c.id}" class="comment">${state[c.id].comment||''}</textarea>`;
+    list.appendChild(div);
+  });
+  list.querySelectorAll('.score').forEach(e=>e.onchange=(ev)=>{ state[ev.target.dataset.id].score=Number(ev.target.value); refresh();});
+  list.querySelectorAll('.comment').forEach(e=>e.oninput=(ev)=>{ state[ev.target.dataset.id].comment=ev.target.value;});
+}
+
+function chapterScores(){
+  const chapters = [...new Set(criteria.map(c=>c.chapter))];
+  return chapters.map(ch=>{
+    const rows = criteria.filter(c=>c.chapter===ch);
+    const max = rows.reduce((a,c)=>a+5*c.w,0);
+    const got = rows.reduce((a,c)=>a+state[c.id].score*c.w,0);
+    return {chapter:ch, pct: Math.round((got/max)*100), got, max};
+  });
+}
+
+function refresh(){
+  const totalWeight = criteria.reduce((a,c)=>a+c.w,0);
+  const weighted = criteria.reduce((a,c)=>a+state[c.id].score*c.w,0);
+  const maturity = (weighted/totalWeight).toFixed(2);
+  const conformity = Math.round(weighted/(5*totalWeight)*100);
+  const low = criteria.filter(c=>state[c.id].score<=1).length;
+  const high = criteria.filter(c=>state[c.id].score>=4).length;
+  document.getElementById('kpis').innerHTML = [
+    ['Maturité globale', maturity + ' / 5'],
+    ['Conformité estimée', conformity + ' %'],
+    ['Points critiques (≤1)', low],
+    ['Bonnes pratiques (≥4)', high]
+  ].map(([k,v])=>`<div class="card"><div class="muted">${k}</div><div class="metric">${v}</div></div>`).join('');
+
+  const chapters = chapterScores();
+  const labels = chapters.map(c=>c.chapter);
+  const vals = chapters.map(c=>c.pct);
+
+  if(!radarChart){
+    radarChart = new Chart(document.getElementById('radar'), {type:'radar', data:{labels, datasets:[{label:'% conformité', data:vals}]}, options:{scales:{r:{min:0,max:100,ticks:{stepSize:20}}}}});
+    barChart = new Chart(document.getElementById('bars'), {type:'bar', data:{labels, datasets:[{label:'% conformité', data:vals}]}, options:{plugins:{legend:{display:false}}, scales:{y:{min:0,max:100}}}});
+    donutChart = new Chart(document.getElementById('donut'), {type:'doughnut', data:{labels:['0-1','2-3','4-5'], datasets:[{data:[0,0,0]}]}});
+  } else {
+    radarChart.data.labels=labels; radarChart.data.datasets[0].data=vals; radarChart.update();
+    barChart.data.labels=labels; barChart.data.datasets[0].data=vals; barChart.update();
+  }
+
+  const dist=[0,0,0]; criteria.forEach(c=>{const s=state[c.id].score; if(s<=1)dist[0]++; else if(s<=3)dist[1]++; else dist[2]++;});
+  donutChart.data.datasets[0].data=dist; donutChart.update();
+
+  const actions = criteria.map(c=>({
+    id:c.id, q:c.q, gap:5-state[c.id].score, priority:(5-state[c.id].score)*c.w, action:c.action
+  })).filter(a=>a.gap>0).sort((a,b)=>b.priority-a.priority).slice(0,10);
+  const tbody = document.querySelector('#actionTable tbody'); tbody.innerHTML='';
+  actions.forEach((a,i)=>{
+    const tr=document.createElement('tr');
+    const delay = a.priority>=12?'0-30 jours':a.priority>=8?'30-90 jours':'90-180 jours';
+    tr.innerHTML=`<td>${i+1}</td><td><strong>${a.id}</strong><br>${a.q}</td><td>${a.gap}/5</td><td>${a.action}</td><td>${delay}</td>`;
+    tbody.appendChild(tr);
+  });
+
+  const heat = document.getElementById('heatmap'); heat.innerHTML='';
+  criteria.forEach(c=>{
+    const s=state[c.id].score; const bg=s>=4?'rgba(16,185,129,.25)':s>=2?'rgba(245,158,11,.25)':'rgba(239,68,68,.25)';
+    heat.innerHTML += `<div class="cell" style="background:${bg}"><strong>${c.id}</strong><br>${s}/5</div>`;
+  });
+}
+
+function exportJSON(){
+  const blob = new Blob([JSON.stringify({date:new Date().toISOString(), state},null,2)], {type:'application/json'});
+  dl(blob, 'iso37001_autoevaluation.json');
+}
+function exportCSV(){
+  const rows = ['id;chapitre;question;score;poids;commentaire'];
+  criteria.forEach(c=>rows.push(`${c.id};${c.chapter};"${c.q.replaceAll('"','""')}";${state[c.id].score};${c.w};"${(state[c.id].comment||'').replaceAll('"','""')}"`));
+  const blob = new Blob([rows.join('\n')], {type:'text/csv;charset=utf-8'});
+  dl(blob, 'iso37001_autoevaluation.csv');
+}
+function dl(blob,name){ const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; a.click(); URL.revokeObjectURL(a.href); }
+
+document.getElementById('resetBtn').onclick=()=>{ if(confirm('Réinitialiser tous les scores ?')){ state = Object.fromEntries(criteria.map(c => [c.id,{score:0,comment:''}])); renderQuestions(); refresh(); }};
+document.getElementById('saveBtn').onclick=()=>{ localStorage.setItem('iso37001_state', JSON.stringify(state)); alert('Sauvegardé dans le navigateur'); };
+document.getElementById('loadBtn').onclick=()=>{ const raw=localStorage.getItem('iso37001_state'); if(raw){ state=JSON.parse(raw); renderQuestions(); refresh(); } };
+document.getElementById('jsonBtn').onclick=exportJSON;
+document.getElementById('csvBtn').onclick=exportCSV;
+
+renderQuestions(); refresh();
+</script>
+</body>
+</html>
