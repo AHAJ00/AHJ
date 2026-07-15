@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>RiskFlow ISO 31000 — Gestion des risques & incidents</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="hero">
+    <nav class="topbar" aria-label="Navigation principale">
+      <div class="brand"><span class="brand-mark">RF</span><span>RiskFlow ISO 31000</span></div>
+      <div class="actions">
+        <button id="exportJsonBtn" class="btn secondary">Exporter JSON</button>
+        <button id="exportCsvBtn" class="btn secondary">Exporter CSV</button>
+        <label class="btn secondary file-label">Importer JSON<input id="importJsonInput" type="file" accept="application/json" /></label>
+        <button id="printBtn" class="btn primary">Télécharger PDF</button>
+      </div>
+    </nav>
+    <section class="hero-content">
+      <p class="eyebrow">Référentiel ISO 31000 • Application autonome</p>
+      <h1>Gestion des risques de bout en bout avec suivi des incidents</h1>
+      <p>Identifiez le contexte, évaluez les risques, pilotez les traitements, surveillez les indicateurs et capitalisez sur les incidents — le tout dans un fichier HTML téléchargeable.</p>
+    </section>
+  </header>
+
+  <main class="app-shell">
+    <section class="grid stats" aria-label="Tableau de bord">
+      <article class="card stat-card"><span>Total risques</span><strong id="riskCount">0</strong></article>
+      <article class="card stat-card"><span>Critiques</span><strong id="criticalCount">0</strong></article>
+      <article class="card stat-card"><span>Plans ouverts</span><strong id="openActionCount">0</strong></article>
+      <article class="card stat-card"><span>Incidents ouverts</span><strong id="openIncidentCount">0</strong></article>
+    </section>
+
+    <section class="card iso-flow">
+      <div>
+        <p class="eyebrow">Processus ISO 31000</p>
+        <h2>Cadre intégré</h2>
+      </div>
+      <ol>
+        <li>Mandat & contexte</li>
+        <li>Identification</li>
+        <li>Analyse</li>
+        <li>Évaluation</li>
+        <li>Traitement</li>
+        <li>Communication</li>
+        <li>Surveillance & amélioration</li>
+      </ol>
+    </section>
+
+    <section class="layout">
+      <aside class="card panel">
+        <h2>Contexte & critères</h2>
+        <label>Organisation<input id="orgName" type="text" placeholder="Nom de l'organisation" /></label>
+        <label>Périmètre<textarea id="scope" rows="3" placeholder="Processus, sites, actifs, parties prenantes..."></textarea></label>
+        <label>Appétence au risque<select id="riskAppetite"><option>Faible</option><option selected>Modérée</option><option>Élevée</option></select></label>
+        <label>Seuil critique<select id="criticalThreshold"><option value="12">≥ 12</option><option value="15" selected>≥ 15</option><option value="20">≥ 20</option></select></label>
+        <button id="saveContextBtn" class="btn primary full">Enregistrer le contexte</button>
+      </aside>
+
+      <section class="card panel">
+        <div class="section-heading"><h2>Registre des risques</h2><button id="resetRiskForm" class="btn ghost">Nouveau</button></div>
+        <form id="riskForm" class="form-grid">
+          <input type="hidden" id="riskId" />
+          <label>Risque<input id="riskTitle" required placeholder="Ex. Indisponibilité SI critique" /></label>
+          <label>Catégorie<select id="riskCategory"><option>Stratégique</option><option>Opérationnel</option><option>Financier</option><option>Conformité</option><option>Cybersécurité</option><option>Santé & sécurité</option><option>Environnement</option></select></label>
+          <label>Propriétaire<input id="riskOwner" placeholder="Responsable" /></label>
+          <label>Cause<textarea id="riskCause" rows="2" placeholder="Sources et causes"></textarea></label>
+          <label>Conséquence<textarea id="riskConsequence" rows="2" placeholder="Impacts attendus"></textarea></label>
+          <label>Probabilité (1-5)<input id="riskLikelihood" type="number" min="1" max="5" value="3" /></label>
+          <label>Impact (1-5)<input id="riskImpact" type="number" min="1" max="5" value="3" /></label>
+          <label>Contrôles existants<textarea id="riskControls" rows="2" placeholder="Mesures en place"></textarea></label>
+          <label>Traitement<select id="riskTreatment"><option>Accepter</option><option>Réduire</option><option>Transférer</option><option>Éviter</option></select></label>
+          <label>Plan d'action<textarea id="riskAction" rows="2" placeholder="Actions, échéances, livrables"></textarea></label>
+          <label>Statut<select id="riskStatus"><option>Ouvert</option><option>En traitement</option><option>Surveillé</option><option>Clos</option></select></label>
+          <button class="btn primary" type="submit">Enregistrer le risque</button>
+        </form>
+      </section>
+    </section>
+
+    <section class="card panel">
+      <div class="section-heading"><h2>Cartographie des risques</h2><input id="riskSearch" type="search" placeholder="Rechercher un risque..." /></div>
+      <div class="table-wrap"><table><thead><tr><th>Risque</th><th>Catégorie</th><th>Score</th><th>Niveau</th><th>Traitement</th><th>Statut</th><th>Actions</th></tr></thead><tbody id="riskTable"></tbody></table></div>
+    </section>
+
+    <section class="layout">
+      <section class="card panel">
+        <div class="section-heading"><h2>Gestion des incidents</h2><button id="resetIncidentForm" class="btn ghost">Nouveau</button></div>
+        <form id="incidentForm" class="form-grid">
+          <input type="hidden" id="incidentId" />
+          <label>Incident<input id="incidentTitle" required placeholder="Ex. Rupture fournisseur" /></label>
+          <label>Risque lié<select id="incidentRisk"></select></label>
+          <label>Gravité<select id="incidentSeverity"><option>Mineure</option><option>Significative</option><option>Majeure</option><option>Critique</option></select></label>
+          <label>Date<input id="incidentDate" type="date" /></label>
+          <label>Description<textarea id="incidentDescription" rows="2"></textarea></label>
+          <label>Réponse immédiate<textarea id="incidentResponse" rows="2"></textarea></label>
+          <label>Cause racine<textarea id="incidentRootCause" rows="2"></textarea></label>
+          <label>Actions correctives<textarea id="incidentCorrective" rows="2"></textarea></label>
+          <label>Statut<select id="incidentStatus"><option>Ouvert</option><option>En investigation</option><option>Correctif en cours</option><option>Clos</option></select></label>
+          <button class="btn primary" type="submit">Enregistrer l'incident</button>
+        </form>
+      </section>
+
+      <section class="card panel">
+        <h2>Journal d'amélioration continue</h2>
+        <div id="incidentList" class="incident-list"></div>
+      </section>
+    </section>
+  </main>
+
+  <footer>Les données restent dans votre navigateur via localStorage. Utilisez les exports pour sauvegarder ou partager le registre.</footer>
+  <script src="app.js"></script>
+</body>
+</html>

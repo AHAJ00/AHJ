@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>RiskFlow ISO 31000 — Gestion des risques & incidents</title>
+  <style>
+:root{--bg:#f4f7fb;--card:#fff;--ink:#132238;--muted:#607089;--primary:#0f766e;--primary-dark:#115e59;--warn:#b45309;--danger:#b91c1c;--line:#d9e2ec;--shadow:0 18px 45px rgba(15,35,60,.12)}*{box-sizing:border-box}body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--ink)}.hero{background:linear-gradient(135deg,#102a43,#0f766e);color:#fff;padding:24px clamp(18px,4vw,56px) 64px}.topbar{display:flex;justify-content:space-between;gap:18px;align-items:center;flex-wrap:wrap}.brand{display:flex;align-items:center;gap:12px;font-weight:800}.brand-mark{display:grid;place-items:center;width:42px;height:42px;border-radius:12px;background:#fff;color:var(--primary)}.actions{display:flex;gap:10px;flex-wrap:wrap}.hero-content{max-width:860px;margin-top:70px}.hero h1{font-size:clamp(34px,6vw,68px);line-height:1;margin:0 0 18px}.hero p{font-size:18px;max-width:760px}.eyebrow{text-transform:uppercase;letter-spacing:.12em;font-size:12px;font-weight:800;color:#7dd3fc}.app-shell{width:min(1220px,94vw);margin:-42px auto 40px}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}.card{background:var(--card);border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow)}.stat-card{padding:22px}.stat-card span{color:var(--muted);font-weight:700}.stat-card strong{display:block;font-size:42px;margin-top:8px}.iso-flow{margin:18px 0;padding:24px;display:flex;justify-content:space-between;gap:24px;align-items:center}.iso-flow h2,.panel h2{margin:0 0 14px}.iso-flow ol{display:flex;gap:10px;flex-wrap:wrap;list-style:none;margin:0;padding:0}.iso-flow li{padding:10px 12px;border-radius:999px;background:#e6fffb;color:var(--primary-dark);font-weight:700}.layout{display:grid;grid-template-columns:360px 1fr;gap:18px;margin:18px 0}.panel{padding:24px}.section-heading{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.form-grid label:nth-of-type(4),.form-grid label:nth-of-type(5),.form-grid label:nth-of-type(8),.form-grid label:nth-of-type(10){grid-column:1/-1}label{display:grid;gap:7px;font-size:13px;font-weight:800;color:var(--muted)}input,select,textarea{width:100%;border:1px solid var(--line);border-radius:12px;padding:11px 12px;font:inherit;color:var(--ink);background:#fff}textarea{resize:vertical}.btn{border:0;border-radius:12px;padding:11px 15px;font-weight:800;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}.primary{background:var(--primary);color:#fff}.primary:hover{background:var(--primary-dark)}.secondary{background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.32)}.ghost{background:#edf2f7;color:var(--ink)}.full{width:100%;margin-top:12px}.file-label input{display:none}.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse}th,td{padding:13px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{font-size:12px;text-transform:uppercase;color:var(--muted)}.badge{display:inline-flex;padding:6px 10px;border-radius:999px;font-weight:800;font-size:12px}.low{background:#dcfce7;color:#166534}.medium{background:#fef3c7;color:var(--warn)}.high{background:#fee2e2;color:var(--danger)}.row-actions{display:flex;gap:8px;flex-wrap:wrap}.mini{padding:7px 9px;border-radius:9px}.incident-list{display:grid;gap:12px}.incident{border:1px solid var(--line);border-radius:16px;padding:14px}.incident header{display:flex;justify-content:space-between;gap:12px}.incident h3{margin:0}.incident p{color:var(--muted)}footer{text-align:center;color:var(--muted);padding:32px}@media(max-width:900px){.grid,.layout{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}.iso-flow{align-items:flex-start;flex-direction:column}}@media print{.topbar .actions,.btn,footer{display:none}.hero{padding-bottom:30px}.app-shell{margin:20px auto}.card{box-shadow:none;break-inside:avoid}}
+
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <nav class="topbar" aria-label="Navigation principale">
+      <div class="brand"><span class="brand-mark">RF</span><span>RiskFlow ISO 31000</span></div>
+      <div class="actions">
+        <button id="exportJsonBtn" class="btn secondary">Exporter JSON</button>
+        <button id="exportCsvBtn" class="btn secondary">Exporter CSV</button>
+        <label class="btn secondary file-label">Importer JSON<input id="importJsonInput" type="file" accept="application/json" /></label>
+        <button id="printBtn" class="btn primary">Télécharger PDF</button>
+      </div>
+    </nav>
+    <section class="hero-content">
+      <p class="eyebrow">Référentiel ISO 31000 • Application autonome</p>
+      <h1>Gestion des risques de bout en bout avec suivi des incidents</h1>
+      <p>Identifiez le contexte, évaluez les risques, pilotez les traitements, surveillez les indicateurs et capitalisez sur les incidents — le tout dans un fichier HTML téléchargeable.</p>
+    </section>
+  </header>
+
+  <main class="app-shell">
+    <section class="grid stats" aria-label="Tableau de bord">
+      <article class="card stat-card"><span>Total risques</span><strong id="riskCount">0</strong></article>
+      <article class="card stat-card"><span>Critiques</span><strong id="criticalCount">0</strong></article>
+      <article class="card stat-card"><span>Plans ouverts</span><strong id="openActionCount">0</strong></article>
+      <article class="card stat-card"><span>Incidents ouverts</span><strong id="openIncidentCount">0</strong></article>
+    </section>
+
+    <section class="card iso-flow">
+      <div>
+        <p class="eyebrow">Processus ISO 31000</p>
+        <h2>Cadre intégré</h2>
+      </div>
+      <ol>
+        <li>Mandat & contexte</li>
+        <li>Identification</li>
+        <li>Analyse</li>
+        <li>Évaluation</li>
+        <li>Traitement</li>
+        <li>Communication</li>
+        <li>Surveillance & amélioration</li>
+      </ol>
+    </section>
+
+    <section class="layout">
+      <aside class="card panel">
+        <h2>Contexte & critères</h2>
+        <label>Organisation<input id="orgName" type="text" placeholder="Nom de l'organisation" /></label>
+        <label>Périmètre<textarea id="scope" rows="3" placeholder="Processus, sites, actifs, parties prenantes..."></textarea></label>
+        <label>Appétence au risque<select id="riskAppetite"><option>Faible</option><option selected>Modérée</option><option>Élevée</option></select></label>
+        <label>Seuil critique<select id="criticalThreshold"><option value="12">≥ 12</option><option value="15" selected>≥ 15</option><option value="20">≥ 20</option></select></label>
+        <button id="saveContextBtn" class="btn primary full">Enregistrer le contexte</button>
+      </aside>
+
+      <section class="card panel">
+        <div class="section-heading"><h2>Registre des risques</h2><button id="resetRiskForm" class="btn ghost">Nouveau</button></div>
+        <form id="riskForm" class="form-grid">
+          <input type="hidden" id="riskId" />
+          <label>Risque<input id="riskTitle" required placeholder="Ex. Indisponibilité SI critique" /></label>
+          <label>Catégorie<select id="riskCategory"><option>Stratégique</option><option>Opérationnel</option><option>Financier</option><option>Conformité</option><option>Cybersécurité</option><option>Santé & sécurité</option><option>Environnement</option></select></label>
+          <label>Propriétaire<input id="riskOwner" placeholder="Responsable" /></label>
+          <label>Cause<textarea id="riskCause" rows="2" placeholder="Sources et causes"></textarea></label>
+          <label>Conséquence<textarea id="riskConsequence" rows="2" placeholder="Impacts attendus"></textarea></label>
+          <label>Probabilité (1-5)<input id="riskLikelihood" type="number" min="1" max="5" value="3" /></label>
+          <label>Impact (1-5)<input id="riskImpact" type="number" min="1" max="5" value="3" /></label>
+          <label>Contrôles existants<textarea id="riskControls" rows="2" placeholder="Mesures en place"></textarea></label>
+          <label>Traitement<select id="riskTreatment"><option>Accepter</option><option>Réduire</option><option>Transférer</option><option>Éviter</option></select></label>
+          <label>Plan d'action<textarea id="riskAction" rows="2" placeholder="Actions, échéances, livrables"></textarea></label>
+          <label>Statut<select id="riskStatus"><option>Ouvert</option><option>En traitement</option><option>Surveillé</option><option>Clos</option></select></label>
+          <button class="btn primary" type="submit">Enregistrer le risque</button>
+        </form>
+      </section>
+    </section>
+
+    <section class="card panel">
+      <div class="section-heading"><h2>Cartographie des risques</h2><input id="riskSearch" type="search" placeholder="Rechercher un risque..." /></div>
+      <div class="table-wrap"><table><thead><tr><th>Risque</th><th>Catégorie</th><th>Score</th><th>Niveau</th><th>Traitement</th><th>Statut</th><th>Actions</th></tr></thead><tbody id="riskTable"></tbody></table></div>
+    </section>
+
+    <section class="layout">
+      <section class="card panel">
+        <div class="section-heading"><h2>Gestion des incidents</h2><button id="resetIncidentForm" class="btn ghost">Nouveau</button></div>
+        <form id="incidentForm" class="form-grid">
+          <input type="hidden" id="incidentId" />
+          <label>Incident<input id="incidentTitle" required placeholder="Ex. Rupture fournisseur" /></label>
+          <label>Risque lié<select id="incidentRisk"></select></label>
+          <label>Gravité<select id="incidentSeverity"><option>Mineure</option><option>Significative</option><option>Majeure</option><option>Critique</option></select></label>
+          <label>Date<input id="incidentDate" type="date" /></label>
+          <label>Description<textarea id="incidentDescription" rows="2"></textarea></label>
+          <label>Réponse immédiate<textarea id="incidentResponse" rows="2"></textarea></label>
+          <label>Cause racine<textarea id="incidentRootCause" rows="2"></textarea></label>
+          <label>Actions correctives<textarea id="incidentCorrective" rows="2"></textarea></label>
+          <label>Statut<select id="incidentStatus"><option>Ouvert</option><option>En investigation</option><option>Correctif en cours</option><option>Clos</option></select></label>
+          <button class="btn primary" type="submit">Enregistrer l'incident</button>
+        </form>
+      </section>
+
+      <section class="card panel">
+        <h2>Journal d'amélioration continue</h2>
+        <div id="incidentList" class="incident-list"></div>
+      </section>
+    </section>
+  </main>
+
+  <footer>Les données restent dans votre navigateur via localStorage. Utilisez les exports pour sauvegarder ou partager le registre.</footer>
+  <script>
+const storeKey = 'riskflow-iso31000-v1';
+const today = new Date().toISOString().slice(0, 10);
+const seed = {
+  context: { orgName: '', scope: '', riskAppetite: 'Modérée', criticalThreshold: 15 },
+  risks: [
+    { id: crypto.randomUUID(), title: 'Indisponibilité du système de production', category: 'Opérationnel', owner: 'DSI', cause: 'Panne infrastructure ou cyberattaque', consequence: 'Arrêt des opérations et pénalités contractuelles', likelihood: 3, impact: 5, controls: 'Sauvegardes, supervision, PCA', treatment: 'Réduire', action: 'Tester le PCA chaque semestre et renforcer la redondance', status: 'En traitement' },
+    { id: crypto.randomUUID(), title: 'Non-conformité réglementaire', category: 'Conformité', owner: 'Juridique', cause: 'Veille incomplète ou procédure obsolète', consequence: 'Sanctions, perte de confiance et coûts de remédiation', likelihood: 2, impact: 4, controls: 'Revue annuelle et référents métiers', treatment: 'Réduire', action: 'Mettre en place une veille mensuelle documentée', status: 'Surveillé' }
+  ],
+  incidents: []
+};
+let state = loadState();
+
+function loadState() {
+  const saved = localStorage.getItem(storeKey);
+  return saved ? JSON.parse(saved) : seed;
+}
+
+function persist() {
+  localStorage.setItem(storeKey, JSON.stringify(state));
+  render();
+}
+
+const $ = id => document.getElementById(id);
+const scoreOf = risk => Number(risk.likelihood) * Number(risk.impact);
+const levelOf = score => score >= Number(state.context.criticalThreshold) ? 'Critique' : score >= 8 ? 'Modéré' : 'Faible';
+const levelClass = level => level === 'Critique' ? 'high' : level === 'Modéré' ? 'medium' : 'low';
+
+function render() {
+  $('orgName').value = state.context.orgName || '';
+  $('scope').value = state.context.scope || '';
+  $('riskAppetite').value = state.context.riskAppetite || 'Modérée';
+  $('criticalThreshold').value = state.context.criticalThreshold || 15;
+  $('riskCount').textContent = state.risks.length;
+  $('criticalCount').textContent = state.risks.filter(r => levelOf(scoreOf(r)) === 'Critique').length;
+  $('openActionCount').textContent = state.risks.filter(r => r.status !== 'Clos' && r.action).length;
+  $('openIncidentCount').textContent = state.incidents.filter(i => i.status !== 'Clos').length;
+  renderRiskOptions();
+  renderRisks();
+  renderIncidents();
+}
+
+function renderRiskOptions() {
+  const options = ['<option value="">Aucun risque lié</option>'].concat(state.risks.map(r => `<option value="${r.id}">${escapeHtml(r.title)}</option>`));
+  $('incidentRisk').innerHTML = options.join('');
+}
+
+function renderRisks() {
+  const query = $('riskSearch').value.toLowerCase();
+  const rows = state.risks.filter(r => [r.title, r.category, r.owner, r.status].join(' ').toLowerCase().includes(query));
+  $('riskTable').innerHTML = rows.map(r => {
+    const score = scoreOf(r);
+    const level = levelOf(score);
+    return `<tr><td><strong>${escapeHtml(r.title)}</strong><br><small>${escapeHtml(r.owner || 'Sans propriétaire')}</small></td><td>${escapeHtml(r.category)}</td><td>${score}</td><td><span class="badge ${levelClass(level)}">${level}</span></td><td>${escapeHtml(r.treatment)}</td><td>${escapeHtml(r.status)}</td><td><div class="row-actions"><button class="btn ghost mini" onclick="editRisk('${r.id}')">Modifier</button><button class="btn ghost mini" onclick="deleteRisk('${r.id}')">Supprimer</button></div></td></tr>`;
+  }).join('') || '<tr><td colspan="7">Aucun risque enregistré.</td></tr>';
+}
+
+function renderIncidents() {
+  $('incidentList').innerHTML = state.incidents.map(i => {
+    const linked = state.risks.find(r => r.id === i.riskId)?.title || 'Non lié';
+    return `<article class="incident"><header><h3>${escapeHtml(i.title)}</h3><span class="badge ${i.status === 'Clos' ? 'low' : 'medium'}">${escapeHtml(i.status)}</span></header><p><strong>${escapeHtml(i.severity)}</strong> • ${escapeHtml(i.date || '')} • Risque : ${escapeHtml(linked)}</p><p>${escapeHtml(i.description || '')}</p><div class="row-actions"><button class="btn ghost mini" onclick="editIncident('${i.id}')">Modifier</button><button class="btn ghost mini" onclick="deleteIncident('${i.id}')">Supprimer</button></div></article>`;
+  }).join('') || '<p>Aucun incident. Déclarez les événements pour alimenter le retour d’expérience.</p>';
+}
+
+function escapeHtml(value = '') {
+  return String(value).replace(/[&<>'"]/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[char]));
+}
+
+function readRiskForm() {
+  return { id: $('riskId').value || crypto.randomUUID(), title: $('riskTitle').value, category: $('riskCategory').value, owner: $('riskOwner').value, cause: $('riskCause').value, consequence: $('riskConsequence').value, likelihood: $('riskLikelihood').value, impact: $('riskImpact').value, controls: $('riskControls').value, treatment: $('riskTreatment').value, action: $('riskAction').value, status: $('riskStatus').value };
+}
+
+function readIncidentForm() {
+  return { id: $('incidentId').value || crypto.randomUUID(), title: $('incidentTitle').value, riskId: $('incidentRisk').value, severity: $('incidentSeverity').value, date: $('incidentDate').value || today, description: $('incidentDescription').value, response: $('incidentResponse').value, rootCause: $('incidentRootCause').value, corrective: $('incidentCorrective').value, status: $('incidentStatus').value };
+}
+
+$('saveContextBtn').addEventListener('click', () => { state.context = { orgName: $('orgName').value, scope: $('scope').value, riskAppetite: $('riskAppetite').value, criticalThreshold: Number($('criticalThreshold').value) }; persist(); });
+$('riskForm').addEventListener('submit', event => { event.preventDefault(); const risk = readRiskForm(); state.risks = state.risks.some(r => r.id === risk.id) ? state.risks.map(r => r.id === risk.id ? risk : r) : [risk, ...state.risks]; event.target.reset(); $('riskId').value = ''; persist(); });
+$('incidentForm').addEventListener('submit', event => { event.preventDefault(); const incident = readIncidentForm(); state.incidents = state.incidents.some(i => i.id === incident.id) ? state.incidents.map(i => i.id === incident.id ? incident : i) : [incident, ...state.incidents]; event.target.reset(); $('incidentId').value = ''; persist(); });
+$('resetRiskForm').addEventListener('click', () => { $('riskForm').reset(); $('riskId').value = ''; });
+$('resetIncidentForm').addEventListener('click', () => { $('incidentForm').reset(); $('incidentId').value = ''; });
+$('riskSearch').addEventListener('input', renderRisks);
+$('printBtn').addEventListener('click', () => window.print());
+$('exportJsonBtn').addEventListener('click', () => download('registre-risques-iso31000.json', JSON.stringify(state, null, 2), 'application/json'));
+$('exportCsvBtn').addEventListener('click', () => download('registre-risques-iso31000.csv', toCsv(), 'text/csv'));
+$('importJsonInput').addEventListener('change', async event => { const file = event.target.files[0]; if (!file) return; state = JSON.parse(await file.text()); persist(); event.target.value = ''; });
+
+function editRisk(id) { const r = state.risks.find(item => item.id === id); if (!r) return; Object.entries({ riskId: r.id, riskTitle: r.title, riskCategory: r.category, riskOwner: r.owner, riskCause: r.cause, riskConsequence: r.consequence, riskLikelihood: r.likelihood, riskImpact: r.impact, riskControls: r.controls, riskTreatment: r.treatment, riskAction: r.action, riskStatus: r.status }).forEach(([id, value]) => $(id).value = value || ''); scrollTo({ top: 420, behavior: 'smooth' }); }
+function deleteRisk(id) { if (confirm('Supprimer ce risque ?')) { state.risks = state.risks.filter(r => r.id !== id); persist(); } }
+function editIncident(id) { const i = state.incidents.find(item => item.id === id); if (!i) return; Object.entries({ incidentId: i.id, incidentTitle: i.title, incidentRisk: i.riskId, incidentSeverity: i.severity, incidentDate: i.date, incidentDescription: i.description, incidentResponse: i.response, incidentRootCause: i.rootCause, incidentCorrective: i.corrective, incidentStatus: i.status }).forEach(([id, value]) => $(id).value = value || ''); }
+function deleteIncident(id) { if (confirm('Supprimer cet incident ?')) { state.incidents = state.incidents.filter(i => i.id !== id); persist(); } }
+
+function download(filename, content, type) { const blob = new Blob([content], { type }); const url = URL.createObjectURL(blob); const a = Object.assign(document.createElement('a'), { href: url, download: filename }); a.click(); URL.revokeObjectURL(url); }
+function toCsv() { const header = ['Risque','Catégorie','Propriétaire','Score','Niveau','Traitement','Statut','Plan action']; const rows = state.risks.map(r => [r.title, r.category, r.owner, scoreOf(r), levelOf(scoreOf(r)), r.treatment, r.status, r.action]); return [header, ...rows].map(row => row.map(cell => `"${String(cell ?? '').replaceAll('"','""')}"`).join(',')).join('\n'); }
+
+window.editRisk = editRisk; window.deleteRisk = deleteRisk; window.editIncident = editIncident; window.deleteIncident = deleteIncident;
+render();
+
+  </script>
+</body>
+</html>
